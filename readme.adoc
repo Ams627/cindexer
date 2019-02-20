@@ -1,9 +1,30 @@
+:toc:
+:sectnums:
+:toclevels: 5
+:sectnumlevels: 5
+:showcomments:
+:xrefstyle: short
+:icons: font
+:source-highlighter: coderay
+:tick: &#x2714;
+:pound: &#xA3;
+
 = Cindexer: a disk indexer
+
+**cindexer** is a disk indexing services aimed at command line users (whether _bash_, _cmd.exe_, _tcc.exe_, _zsh_ etc.) but initially
+based on Windows.
+
+The cindexer indexing service runs when the users system is idle - it will only start when the system has been idle for
+a fixed period of time (e.g. five minutes).
 
 == .com and .exe files
 
-`cindexer.com` is a command line (i.e. console) program written in C# - it originally starts life as an ordinary executable, but
-simply gets renamed to `cindexer.com` after it is built.
+The system is divided into two components - a command line interface and an indexing service.
+
+`cindexer.com` is a command line (i.e. console) program written in C# - it originally starts life as an
+executable file (`.exe`), but is simply renamed to `cindexer.com` after it is built. `Cindexer.com` is the primary
+interface to the cindexer indexing service - it can start and stop the service and also uses the index created
+by the indexing service. Unlike the Windows indexing service, the cindexer service does NOT search **within** files.
 
 `cindexer.exe` is a C# GUI app (i.e. it is built with the linker option `/subsystem:windows`) with no user
 interface. It runs invisibly and is responsible for indexing the disk(s).
@@ -15,25 +36,45 @@ can report on its status.
 The moment the user moves the mouse or touches the keyboard, indexing stops. It can be forced to index manually.
 
 == Version
-`cindexer --version` prints the version number.
+`cindexer version` and `cindexer --version` are indentical and both print the version number.
+
+`cindexer version -v` prints much more detailed information.
+
 
 == Settings
 
-The settings file shall be in the usual place:
+The following command shows the current settings:
+
+----
+cindexer settings
+----
+
+You can edit the settings with:
+
+----
+cindexer esettings
+----
+
+This command will open the settings file in the default editor for .txt files - if this is not available, it will
+hunt around for a suitable editor in a few standard places.
+
+
+The settings file itself shall be in the expected place:
 
 ----
 C:\Users\<username>\AppData\Roaming\ams\cindexer\settings.txt
 ----
 
-The command `cindexer --settings` shall open the settings file in the default editor for .txt files.
 
-If the environment variabe cindexersettings is set, then the file shalled be placed in the location specified by this
-variable instead of the default location.
+If the environment variabe `CINDEXERSETTINGS` is set, then the settings file `settings.txt` shalled be placed in the location specified
+by this variable instead of the default location.
 
 === Reset Settings
 
+The following command resets all settings to their default:
+
 ----
-cindexer --reset
+cindexer reset
 ----
 
 === Disks to index
@@ -45,6 +86,41 @@ By default, only the Windows boot drive (`C:\`) is indexed. However, a list of i
 disks=cdeg
 extra=h:\mycode
 ----
+
+By default, files with the following extensions are indexed - case is ignored.
+
+----
+.c
+.cc
+.cpp
+.cs
+.csproj
+.vcxproj
+.vcxproj.filters
+.h
+.hpp
+.java
+.properties
+----
+
+You can ignore an extension by adding it to the exclude list in the indexing section of the settings file:
+
+Excluded extensions are separated by semicolons - the dot of the extension is optional and spaces are ignored.
+
+----
+[indexing]
+exclude='.cpp;.java'
+----
+
+You can include extra extensions by adding them to the include list in the indexing section of the settings file.
+
+Included extensions are separated by semicolons - the dot of the extension is optional and spaces are ignored.
+
+----
+[indexing]
+include='.xml;.xslt'
+----
+
 
 === Start of indexing
 The timing section defines when indexing should start:
@@ -68,7 +144,14 @@ ext=vcxproj, sln
 The indexes are stored in the `.cindex` hidden folder in the root of the Windows boot drive. However, setting the environment
 variable `CINDEXERINDEX` forces the use of a different folder.
 
-== Status
+== Commands
+
+Note that many of the commands simply print results as they expect the shell from which `cindexer.com` is launched 
+to be able to use the printed result.
+
+It is not possible for an external command to change the shell's working directory.
+
+=== Status
 
 The `status` command prints the status of the indexer, including process id, last time run, idle time allowed before next
 run etc.
@@ -77,7 +160,7 @@ run etc.
 cindexer status
 ----
 
-== Change Directory
+=== Change Directory
 
 ----
 cindexer cd <dirname>
@@ -86,6 +169,51 @@ cindexer cd <dirname>
 This command prints a folder matching `<dirname>` if there is an exact match. If there is more than one match, all folder
 names are printed, one on each line.
 
-If more than one match, the status returned by the cindexer command is -1.
+If the `CINDEXERUNIXY` environment variable is set (to anything) then the path is printed in "unix" format - i.e. with
+slashes instead of backslashes and `c:\bin` replaced with `/c/bin`.
 
+**If more than one match, the status returned by the cindexer command is -1.**
+
+=== Change to directory of file
+
+----
+cindexer cf <filename>
+----
+
+This command prints a folder matching containing `<filename>` if one exists. If there is more than one match, all folder
+names are printed, one on each line.
+
+If the `CINDEXERUNIXY` environment variable is set (to anything) then the path is printed in "unix" format - i.e. with
+slashes instead of backslashes and `c:\bin` replaced with `/c/bin`.
+
+WARNING: If more than one match, the status returned by this command is -1.
+
+=== Edit file
+
+----
+cindexer edit <filename>
+----
+
+This command edits a file from the index if a match can be found. It considers all extensions, does not consider case. If no
+extension is specified, it considers all possible extensions.
+
+A common text editor is used. Cindexer tries to find notepad++ or falls back to notepad. Other editors can be
+specified in the settings file.
+
+WARNING: If more than one match, the status returned by this command is -1.
+
+=== Edit file
+
+----
+cindexer e <extgroup> <filename>
+----
+
+This command edits a file from the index that matches a single extension or extension alias.
+
+Extension aliases can be defined in the settings file.
+
+A common text editor is used. Cindexer tries to find notepad++ or falls back to notepad. Other editors can be
+specified in the settings file.
+
+WARNING: If more than one match, the status returned by this command is -1.
 
