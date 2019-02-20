@@ -1,0 +1,89 @@
+= Cindexer: a disk indexer
+
+== .com and .exe files
+
+`cindexer.com` is a command line (i.e. console) program written in C# - it originally starts life as an ordinary executable, but
+simply gets renamed to `cindexer.com` after it is built.
+
+`cindexer.exe` is a C# GUI app (i.e. it is built with the linker option `/subsystem:windows`) with no user
+interface. It runs invisibly and is responsible for indexing the disk(s).
+
+`cindexer.com` and `cindexer.exe` communicate via a named pipe. `cindexer.com` starts and stops `cindexer.exe` and
+can report on its status.
+
+`cindexer.exe` will start to run a full disk index only when the Windows system has been idle for a while.
+The moment the user moves the mouse or touches the keyboard, indexing stops. It can be forced to index manually.
+
+== Version
+`cindexer --version` prints the version number.
+
+== Settings
+
+The settings file shall be in the usual place:
+
+----
+C:\Users\<username>\AppData\Roaming\ams\cindexer\settings.txt
+----
+
+The command `cindexer --settings` shall open the settings file in the default editor for .txt files.
+
+If the environment variabe cindexersettings is set, then the file shalled be placed in the location specified by this
+variable instead of the default location.
+
+=== Reset Settings
+
+----
+cindexer --reset
+----
+
+=== Disks to index
+
+By default, only the Windows boot drive (`C:\`) is indexed. However, a list of indexing locations can be specified:
+
+[indexing]
+disks=cdeg
+extra=h:\mycode
+
+=== Start of indexing
+The timing section defines when indexing should start:
+
+----
+[timing]
+start=0
+----
+
+=== Extensions
+
+Defines special extensions (without a dot) to index. Files with these extensions are stored in special index files
+because they are more important for everyday work.
+
+----
+[extensions]
+ext=vcxproj, sln
+----
+
+== Index Folder
+The indexes are stored in the .cindex hidden folder in the root of the Windows boot drive. However, setting the environment
+variable cindexerindex can force the use of a different folder.
+
+== Status
+
+The `status` command prints the status of the indexer, including process id, last time run, idle time allowed before next
+run etc.
+
+----
+cindexer status
+----
+
+== Change Directory
+
+----
+cindexer cd <dirname>
+----
+
+This command prints a folder matching `<dirname>` if there is an exact match. If there is more than one match, all folder
+names are printed, one on each line.
+
+If more than one match, the status returned by the cindexer command is -1.
+
+
