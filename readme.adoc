@@ -241,3 +241,25 @@ cindexer big
 
 This command lists all the "big" files from the index in descending order of size.
 
+
+=== Manually run or stop the indexing service
+
+----
+cindexer index
+----
+
+immediately starts indexing.
+
+
+----
+cindexer stop
+----
+
+immediately stops the indexing service
+
+=== Kill and restart `cindexer.exe`
+
+----
+cindexer restart
+----
+
