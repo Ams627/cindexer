@@ -40,9 +40,11 @@ cindexer --reset
 
 By default, only the Windows boot drive (`C:\`) is indexed. However, a list of indexing locations can be specified:
 
+----
 [indexing]
 disks=cdeg
 extra=h:\mycode
+----
 
 === Start of indexing
 The timing section defines when indexing should start:
@@ -63,7 +65,7 @@ ext=vcxproj, sln
 ----
 
 == Index Folder
-The indexes are stored in the .cindex hidden folder in the root of the Windows boot drive. However, setting the environment
+The indexes are stored in the `.cindex` hidden folder in the root of the Windows boot drive. However, setting the environment
 variable cindexerindex can force the use of a different folder.
 
 == Status
