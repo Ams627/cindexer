@@ -103,7 +103,7 @@ By default, files with the following extensions are indexed - case is ignored.
 .properties
 ----
 
-You can ignore an extension by adding it to the exclude list in the indexing section of the settings file:
+You can ignore an extension by adding it to the _exclude list_ in the indexing section of the settings file:
 
 Excluded extensions are separated by semicolons - the dot of the extension is optional and spaces are ignored.
 
@@ -112,7 +112,7 @@ Excluded extensions are separated by semicolons - the dot of the extension is op
 exclude='.cpp;.java'
 ----
 
-You can include extra extensions by adding them to the include list in the indexing section of the settings file.
+You can include extra extensions by adding them to the _include list_ in the indexing section of the settings file.
 
 Included extensions are separated by semicolons - the dot of the extension is optional and spaces are ignored.
 
@@ -144,9 +144,16 @@ ext=vcxproj, sln
 The indexes are stored in the `.cindex` hidden folder in the root of the Windows boot drive. However, setting the environment
 variable `CINDEXERINDEX` forces the use of a different folder.
 
+== Size service
+cindexer produces a file `dir.txt` in the index folder which contains the size of each directory on the disk if that size
+is greater than <dirsizeThreshold> (default 1 megabyte) defined in the settings file.
+
+It also produces `bigfiles.txt` in the index folder which contains a list of all files whose size
+is greater than <filesizeThreshold> (default 10 megabytes) defined in the settings file.
+                 
 == Commands
 
-Note that many of the commands simply print results as they expect the shell from which `cindexer.com` is launched 
+Note that many of the commands simply print results as they expect the shell (from which `cindexer.com`) is launched 
 to be able to use the printed result.
 
 It is not possible for an external command to change the shell's working directory.
@@ -172,7 +179,7 @@ names are printed, one on each line.
 If the `CINDEXERUNIXY` environment variable is set (to anything) then the path is printed in "unix" format - i.e. with
 slashes instead of backslashes and `c:\bin` replaced with `/c/bin`.
 
-**If more than one match, the status returned by the cindexer command is -1.**
+WARNING: If more than one match, the status returned by this command is -1.
 
 === Change to directory of file
 
@@ -197,7 +204,7 @@ cindexer edit <filename>
 This command edits a file from the index if a match can be found. It considers all extensions, does not consider case. If no
 extension is specified, it considers all possible extensions.
 
-A common text editor is used. Cindexer tries to find notepad++ or falls back to notepad. Other editors can be
+A common text editor is used. Cindexer tries to find `notepad++` or falls back to `notepad.exe`. Other editors can be
 specified in the settings file.
 
 WARNING: If more than one match, the status returned by this command is -1.
@@ -216,4 +223,21 @@ A common text editor is used. Cindexer tries to find notepad++ or falls back to 
 specified in the settings file.
 
 WARNING: If more than one match, the status returned by this command is -1.
+
+=== Size of a directory
+
+----
+cindexer sz <dirname>
+----
+
+This command reports the size of a folder from the index.
+
+
+=== Show big files
+
+----
+cindexer big
+----
+
+This command lists all the "big" files from the index in descending order of size.
 
